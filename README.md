@@ -21,7 +21,14 @@ Score of Gradient Hunt 2.0 -:
 
 
 ## SubTask-2
+To complete this task, I started by learning how GANs work, focusing on understanding the roles of the discriminator and generator. I decided to use the MNIST dataset, which has images of handwritten digits.
+
+For the coding part, I began by importing the required libraries. Then, I created separate classes for the discriminator and generator. After setting the hyperparameters, I trained both the discriminator and generator. To check the results, I used TensorBoard to view the generated images.
+
+At first, I coded the GAN without using CNN layers. It worked, but the images it generated were blurry and not very clear. To improve this, I reworked the code and added CNN layers to the architecture. This made a big difference, and I was able to generate much clearer images of handwritten numbers.
+
 
 ![Screenshot 2025-01-15 181239](https://github.com/user-attachments/assets/a3f3ad1d-1115-49e2-99f5-ae1c58269d44)
+
 
 
