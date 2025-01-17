@@ -8,7 +8,7 @@ Original file is located at
 """
 
 from google.colab import files
-files.upload()  # Upload kaggle.json
+files.upload()  
 
 !mkdir -p ~/.kaggle
 !mv kaggle.json ~/.kaggle/
@@ -33,57 +33,40 @@ from tqdm.notebook import tqdm
 from keras.preprocessing.image import ImageDataGenerator
 
 
-# def createdataframe(dir):
-#     image_paths = []
-#     labels = []
-#     for label in os.listdir(dir):
-#         for imagename in os.listdir(os.path.join(dir, label)):
-#             image_paths.append(os.path.join(dir, label, imagename))
-#             labels.append(label)
-#         print(label, "completed")
-#     return image_paths, labels
+
 
 def createdataframe(dir):
     image_paths = []
     labels = []
 
-    # Check if the directory contains subdirectories or just files
+ 
     for item in os.listdir(dir):
         full_path = os.path.join(dir, item)
 
-        if os.path.isdir(full_path):  # If it's a subdirectory
+        if os.path.isdir(full_path):  
             for imagename in os.listdir(full_path):
                 image_paths.append(os.path.join(full_path, imagename))
-                labels.append(item)  # Use the subdirectory name as the label
-        else:  # If it's a file (e.g., for test data)
+                labels.append(item)  
+        else: 
             image_paths.append(full_path)
-            labels.append("unknown")  # Assign a default label if labels are not available
+            labels.append("unknown")  
 
     print("Dataframe creation completed.")
     return image_paths, labels
 
 
-# def extract_features(images):
-#     features = []
-#     for image in tqdm(images):
-#         img = load_img(image, target_size=(236, 236))
-#         img = np.array(img)
-#         features.append(img)
-#     features = np.array(features)
-#     features = features.reshape(features.shape[0], 236, 236, 3)  # Reshape all images in one go
-#     return features
 
 def extract_features(images):
     features = []
     for image in tqdm(images):
         try:
-            img = load_img(image, target_size=(236, 236))  # Load the image
-            img = np.array(img)  # Convert to numpy array
-            features.append(img)  # Add to the features list
+            img = load_img(image, target_size=(236, 236))  
+            img = np.array(img)  
+            features.append(img) 
         except Exception as e:
-            print(f"Error loading image {image}: {e}")  # Log the error
+            print(f"Error loading image {image}: {e}")  
     features = np.array(features)
-    features = features.reshape(features.shape[0], 236, 236, 3)  # Reshape all images in one go
+    features = features.reshape(features.shape[0], 236, 236, 3)
     return features
 
 
@@ -108,11 +91,9 @@ TEST_DIR="Data/Test"
 test=pd.DataFrame()
 test['image'],test['label']=createdataframe(TEST_DIR)
 
-# Debugging: Print labels in the test set and the ones learned by LabelEncoder
 print("Unique labels in the test set:", test['label'].unique())
 print("Labels learned by LabelEncoder:", le.classes_)
 
-# Filter out any unknown labels
 valid_labels = le.classes_
 test = test[test['label'].isin(valid_labels)]
 
@@ -129,7 +110,7 @@ y_test = to_categorical(y_test, num_classes=2)
 
 
 model = Sequential()
-# Convolutional layers
+
 model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(236, 236, 3)))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
@@ -154,51 +135,46 @@ model.fit(x=x_train, y=y_train, batch_size=25, epochs=20)
 from tensorflow.keras.preprocessing.image import img_to_array
 
 def prepare_test_data(test_dir, target_size=(236, 236)):
-    # Get all image files and sort them numerically
+
     img_files = os.listdir(test_dir)
 
-    # Custom sort key function to handle numerical sorting
+  
     def get_img_number(filename):
-        # Extract number from image_X.jpg format
+ 
         return int(filename.split('_')[1].split('.')[0])
 
-    # Sort files numerically
+
     img_files.sort(key=get_img_number)
 
     test_images = []
     test_ids = []
 
-    # Process images in sorted order
     for img_name in tqdm(img_files, desc="Processing test images"):
         img_path = os.path.join(test_dir, img_name)
 
         try:
-            # Verify if file exists
+   
             if not os.path.exists(img_path):
                 print(f"Warning: File not found: {img_path}")
                 continue
 
-            # Check if file is empty
             if os.path.getsize(img_path) == 0:
                 print(f"Warning: Empty file: {img_path}")
                 continue
 
-            # Try to open and verify the image
             img = load_img(img_path, target_size=target_size)
 
-            # Convert to array and check if valid
             img_array = img_to_array(img)
 
-            # Check if array has valid dimensions
+      
             if img_array.shape != (*target_size, 3):
                 print(f"Warning: Invalid image dimensions for {img_path}")
                 continue
 
-            # Normalize and append
+
             img_array = img_array / 255.0
             test_images.append(img_array)
 
-            # Remove .jpg extension from image name
             clean_id = img_name.split('.')[0]
             test_ids.append(clean_id)
 
@@ -212,26 +188,26 @@ def prepare_test_data(test_dir, target_size=(236, 236)):
     print(f"Successfully processed {len(test_images)} images")
     return np.array(test_images), test_ids
 
-# Let's add some diagnostic information before processing
+
 print(f"Test directory path: {TEST_DIR}")
 print(f"Files in test directory: {os.listdir(TEST_DIR)[:5]} ... (showing first 5)")
 print(f"Total files found: {len(os.listdir(TEST_DIR))}")
 
-# Prepare test data with ordered images
+
 x_test, test_ids = prepare_test_data(TEST_DIR)
 
-# Predict labels for the test set
+
 predictions = model.predict(x_test)
 predicted_classes = np.argmax(predictions, axis=1)
 predicted_labels = le.inverse_transform(predicted_classes)
 
-# Create submission dataframe
+
 submission_df = pd.DataFrame({
-    'Id': test_ids,  # These IDs now don't have .jpg extension
+    'Id': test_ids,  
     'Label': predicted_labels
 })
 
-# Add additional verification
+
 print("\nSubmission DataFrame Info:")
 print(submission_df.info())
 print("\nFirst 5 rows:")
@@ -239,6 +215,5 @@ print(submission_df.head())
 print("\nLast 5 rows:")
 print(submission_df.tail())
 
-# Save the submission file
 submission_df.to_csv('submission.csv', index=False)
 print("\nSubmission file saved as 'submission.csv'")
