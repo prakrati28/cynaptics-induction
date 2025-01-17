@@ -3,7 +3,7 @@ To begin the task, I first focused on learning the basics of Python, just enough
 
 Given the limited time available, I decided to focus only on that was directly relevant to the task. So, I concentrated on learning about neural networks  , convolutional neural networks (CNNs) , GAN through YouTube videos.
 
-## SubTask-1
+## Sub Task-1
 To tackle this subtask, I started by understanding exactly what the task required me to do. My first step was to go through the script to figure out the terminologies, functions, how it works, and the overall training process. Once I had a decent understanding, I made some changes to the script, added the dataset, and ran it.
 
 Of course, there were a lot of errors at first. I kept fixing them one by one, running the script again after every fix. This process repeated several times until I finally got the script working and could train the model. However, the accuracy I got was very low initially.
@@ -20,7 +20,7 @@ Score of Gradient Hunt 2.0 -:
 
 
 
-## SubTask-2
+## Sub Task-2
 To complete this task, I started by learning how GANs work, focusing on understanding the roles of the discriminator and generator. I decided to use the MNIST dataset, which has images of handwritten digits.
 
 For the coding part, I began by importing the required libraries. Then, I created separate classes for the discriminator and generator. After setting the hyperparameters, I trained both the discriminator and generator. To check the results, I used TensorBoard to view the generated images.
